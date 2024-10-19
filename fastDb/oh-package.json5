@@ -1,0 +1,16 @@
+{
+  "name": "fastdb",
+  "version": "1.0.0",
+  "description": "快速操作数据库.",
+  "keywords": ["db", "database", "数据库"],
+  "main": "Index.ets",
+  "author": {
+    "name": "利民",
+    "email": "46453868@qq.com"
+  },
+  "homepage": "https://github.com/helimin19",
+  "repository": "https://github.com/helimin19",
+  "license": "ISC",
+  "obfuscated": true,
+  "dependencies": {}
+}
