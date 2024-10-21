@@ -1,6 +1,17 @@
-# FastDb使用说明
+# FastDb
 
-## 1. 实体类的创建
+## 1. 简介与推荐
+[FastDb](https://github.com/helimin19/FastDb)
+是一个适用于快速操作数据库的库，能够按对象进行新增，修改，删除，查询等
+
+## 2. 下载安装
+
+`ohpm i @hlm/fastdb`
+
+OpenHarmony ohpm 环境配置等更多内容，请参考[如何安装 OpenHarmony ohpm 包](https://ohpm.openharmony.cn/#/cn/help/downloadandinstall)
+
+
+## 3. 实体类的创建
 ```
 @TableDecorator({name: "T_Student"})
 export class Student {
@@ -50,11 +61,11 @@ fastDb.DataBaseVersionManager.add({
 });
 ```
 
-## 3. 取得数据库
+## 4. 取得数据库
 ```
 private db = new fastDb.Database(this.context, "数据库名称不带.db");
 ```
-## 4. 新增、修改、删除、查询、计算
+## 5. 新增、修改、删除、查询、计算
 ### 1. 新增
 ```
     const student: Student = new Student();
