@@ -1,6 +1,6 @@
 {
   "name": "@hlm/fastdb",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "快速操作数据库.",
   "keywords": ["db", "database", "数据库"],
   "main": "Index.ets",

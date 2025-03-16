@@ -1,22 +1,9 @@
-
 import { common } from '@kit.AbilityKit';
 import { fastDb } from 'fast';
 import { Student } from '../entity/Student';
-import { Subject } from '../entity/Subject';
-import { promptAction } from '@kit.ArkUI';
+import { promptAction, router } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { relationalStore } from '@kit.ArkData';
-
-fastDb.DataBaseVersionManager.init(() => {
-  new Student();
-  new Subject();
-});
-
-fastDb.DataBaseVersionManager.add({
-  version: 1,
-  order: 1,
-  script: "CREATE TABLE IF NOT EXISTS T_Student (ID INTEGER PRIMARY KEY AUTOINCREMENT, NAME TEXT NOT NULL, AGE INTEGER)"
-});
 
 @Entry
 @Component
@@ -87,6 +74,13 @@ struct Index {
           this.getMaxId();
         })
 
+      Button('学生管理')
+        .width("100%")
+        .margin({top: 16})
+        .onClick(() => {
+          router.pushUrl({ url: "pages/SearchStudent"})
+        })
+
     }
     .height('100%')
     .width('100%')
@@ -101,7 +95,15 @@ struct Index {
       studentList.push(student);
     }
 
-    this.db.insert(studentList, (err, num) => {
+    // this.db.insertAsync(studentList).then((num) => {
+    //   promptAction.showToast({message: `新增成功:${num}`});
+    // }).catch((err: BusinessError) => {
+    //   promptAction.showToast({message: `新增失败:${err.message}`});
+    // })
+
+    const fastdb = new fastDb.Database(this.context, "student2");
+
+    fastdb.insert(studentList, (err, num) => {
       if (err) {
         promptAction.showToast({message: `新增失败:${err.message}`});
         return;
@@ -144,7 +146,7 @@ struct Index {
   private selectTableRecord() {
     let where: fastDb.Where = new fastDb.Where(new Student());
     where.greaterThan("id", 0);
-    this.db.select(where, (err: BusinessError | null | undefined, list?: Array<fastDb.TableRecord>) => {
+    this.db.selectRecord(where, (err: BusinessError | null | undefined, list?: Array<fastDb.TableRecord>) => {
       if (err) {
         promptAction.showToast({message: `查询失败:${err.message}`});
         return;
@@ -163,7 +165,7 @@ struct Index {
     let where: fastDb.Where = new fastDb.Where(new Student());
     where.greaterThan("id", 0);
 
-    this.db.query(where, () => new Student(), (err: BusinessError | null | undefined, list?: Array<Student>) => {
+    this.db.select(where, () => new Student(), (err: BusinessError | null | undefined, list?: Array<Student>) => {
       if (err) {
         promptAction.showToast({message: `查询失败:${err.message}`});
         return;
@@ -178,7 +180,7 @@ struct Index {
 
   private selectBysqlTableRecord() {
     let sql = "select id, name FROM T_Student where id > ?";
-    this.db.selectBySql(sql, [50], (err: BusinessError | null | undefined, list?: Array<fastDb.TableRecord>) => {
+    this.db.selectRecordBySql(sql, [50], (err: BusinessError | null | undefined, list?: Array<fastDb.TableRecord>) => {
       if (err) {
         promptAction.showToast({message: `查询失败:${err.message}`});
         return;
@@ -192,7 +194,7 @@ struct Index {
 
   private selectBysqlEntity() {
     let sql = "select id, name FROM T_Student where id > ?";
-    this.db.queryBySql(sql, [50], () => new Student(), (err: BusinessError | null | undefined, list?: Array<Student>) => {
+    this.db.selectBySql(sql, [50], () => new Student(), (err: BusinessError | null | undefined, list?: Array<Student>) => {
       if (err) {
         promptAction.showToast({message: `查询失败:${err.message}`});
         return;

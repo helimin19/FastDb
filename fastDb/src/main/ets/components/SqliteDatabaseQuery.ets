@@ -12,28 +12,11 @@ export class QueryWhere extends relationalStore.RdbPredicates {
 
   public entity: Object;
   private entityParser: SqliteDatabaseEntityParser;
-  private sql: string = "";
-  private isCreateSql: boolean = false;
 
-  constructor(entity: Object, createSql?: boolean) {
+  constructor(entity: Object) {
     super((Reflect.get(entity, SqliteDatabaseConstant.METADATA_TABLE) as DataTableDecoratorParameter).name);
     this.entity = entity;
     this.entityParser = new SqliteDatabaseEntityParser(this.entity);
-    if (createSql) {
-      this.isCreateSql = createSql;
-    }
-  }
-
-  appendSql(expression: string, name?: string, value?: relationalStore.ValueType) {
-    if (this.isCreateSql) {
-      if (name && value) {
-        this.sql += `${name} ${expression} ${value}`;
-      } else if (name) {
-        this.sql += `${name}${expression}`;
-      } else {
-        this.sql += `${expression}`;
-      }
-    }
   }
 
   inDevices(devices: Array<string>): QueryWhere {
@@ -50,7 +33,6 @@ export class QueryWhere extends relationalStore.RdbPredicates {
     const fieldDecoratorParameter = this.entityParser.getFieldDecoratorParameter(field);
     if (fieldDecoratorParameter) {
       super.equalTo(fieldDecoratorParameter.name, value);
-      this.appendSql("=", fieldDecoratorParameter.name, value);
     }
     return this;
   }
@@ -59,20 +41,17 @@ export class QueryWhere extends relationalStore.RdbPredicates {
     const fieldDecoratorParameter = this.entityParser.getFieldDecoratorParameter(field);
     if (fieldDecoratorParameter) {
       super.notEqualTo(fieldDecoratorParameter.name, value);
-      this.appendSql("!=", fieldDecoratorParameter.name, value);
     }
     return this;
   }
 
   beginWrap(): QueryWhere {
     super.beginWrap();
-    this.appendSql("(");
     return this;
   }
 
   endWrap(): QueryWhere {
     super.endWrap();
-    this.appendSql(")");
     return this;
   }
 

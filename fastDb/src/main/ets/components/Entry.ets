@@ -1,7 +1,8 @@
 import { DataFieldDecoratorParameter, DataTableDecoratorParameter } from './Decorator';
 import { SqliteDatabase } from './SqliteDatabase';
+import { SqliteDataBaseConfig, SqliteDataBaseConfigManager } from './SqliteDataBaseConfig';
 import { DataTableField, DataTableRecord } from './SqliteDatabaseEnfity';
-import { SqliteDataBaseError } from './SqliteDatabaseError'
+import { SqliteDataBaseError } from './SqliteDatabaseError';
 import { DeleteEntity, QueryWhere, UpdateEntity } from './SqliteDatabaseQuery';
 import { SqliteDataBaseVersionConfig, SqliteDataBaseVersionManager } from './SqliteDatabaseVersion';
 
@@ -19,5 +20,7 @@ export namespace fastDb {
     export interface TableDecoratorParameter extends DataTableDecoratorParameter{}
     export interface FieldDecoratorParameter extends DataFieldDecoratorParameter {}
 
+    export abstract class DataBaseConfig extends SqliteDataBaseConfig{}
+    export class DataBaseConfigManager extends SqliteDataBaseConfigManager{}
 
 }

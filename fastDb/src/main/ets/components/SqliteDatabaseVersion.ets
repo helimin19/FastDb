@@ -3,6 +3,8 @@
  * 数据库版本配置
  */
 export interface SqliteDataBaseVersionConfig {
+  // 数据库名称
+  dbName: string;
   // 所属版本
   version: number;
   // 执行顺序
@@ -16,23 +18,35 @@ export interface SqliteDataBaseVersionConfig {
  */
 export class SqliteDataBaseVersionManager {
   // 存储各版本需要执行的脚本
-  private static scriptList: Array<SqliteDataBaseVersionConfig> = new Array();
+  private static scriptMap: Map<string, Array<SqliteDataBaseVersionConfig>> = new Map<string, Array<SqliteDataBaseVersionConfig>>();
 
   /**
    * 添加需要执行的脚本
    * @param config 数据库版本配置
    */
   public static add(config: SqliteDataBaseVersionConfig) {
-    SqliteDataBaseVersionManager.scriptList.push(config);
+    config.dbName = config.dbName + ".db";
+    let items = SqliteDataBaseVersionManager.scriptMap.get(config.dbName);
+    if (!items) {
+      items = new Array<SqliteDataBaseVersionConfig>();
+    }
+    items.push(config);
+    SqliteDataBaseVersionManager.scriptMap.set(config.dbName, items);
   }
 
   /**
    * 取得需要执行的脚本
+   * @param databaseName 数据库名称(带.db)
    * @param version 当前数据库的版本
    * @returns 需要执行的脚本
    */
-  public static get(version: number): Array<string> {
-    return SqliteDataBaseVersionManager.scriptList.filter((config: SqliteDataBaseVersionConfig) => {
+  public static get(databaseName: string, version: number): Array<string> {
+    let items = SqliteDataBaseVersionManager.scriptMap.get(databaseName);
+    if (!items || items.length === 0) {
+      return new Array<string>();
+    }
+
+    return items.filter((config: SqliteDataBaseVersionConfig) => {
       return config.version > version;
     }).sort((config1: SqliteDataBaseVersionConfig, config2: SqliteDataBaseVersionConfig) => {
       return config1.order - config2.order;
@@ -45,8 +59,13 @@ export class SqliteDataBaseVersionManager {
    * 取得最大版本
    * @returns 最大版本
    */
-  public static getMaxVersion(): number {
-    return SqliteDataBaseVersionManager.scriptList.map<number>((config: SqliteDataBaseVersionConfig, _index: number, _array: SqliteDataBaseVersionConfig[]) => {
+  public static getMaxVersion(databaseName: string): number {
+    let items = SqliteDataBaseVersionManager.scriptMap.get(databaseName);
+    if (!items || items.length === 0) {
+      return 0;
+    }
+
+    return items.map<number>((config: SqliteDataBaseVersionConfig, _index: number, _array: SqliteDataBaseVersionConfig[]) => {
       return config.version;
     }).sort((a: number, b: number) => {
       return a - b;
@@ -56,8 +75,12 @@ export class SqliteDataBaseVersionManager {
   /**
    * 清空需要执行的脚本
    */
-  public static clear() {
-    SqliteDataBaseVersionManager.scriptList.length = 0;
+  public static clear(databaseName: string) {
+    let items = SqliteDataBaseVersionManager.scriptMap.get(databaseName);
+    if (items) {
+      items.length = 0;
+      SqliteDataBaseVersionManager.scriptMap.set(databaseName, items);
+    }
   }
 
   /**
