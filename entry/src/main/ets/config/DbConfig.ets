@@ -6,7 +6,7 @@ import { relationalStore } from "@kit.ArkData";
  */
 export class DbConfig extends fastDb.DataBaseConfig {
 
-  public getMaxVersion(databaseName: string): number {
+  public getMaxVersion(databaseName: string, version : number): number {
     if (databaseName === "student2.db") {
       return 1;
     }

@@ -419,7 +419,7 @@ export class SqliteDatabase {
           this.store?.executeSql(script);
         });
       }
-      const maxVersion = config.getMaxVersion(this.databaseName);
+      const maxVersion = config.getMaxVersion(this.databaseName, this.store!.version);
       if (maxVersion > 0) {
         this.store!.version = maxVersion;
       }
