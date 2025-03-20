@@ -14,7 +14,7 @@ export class QueryWhere extends relationalStore.RdbPredicates {
   private entityParser: SqliteDatabaseEntityParser;
 
   constructor(entity: Object) {
-    super((Reflect.get(entity, SqliteDatabaseConstant.METADATA_TABLE) as DataTableDecoratorParameter).name);
+    super((Reflect.get(entity, SqliteDatabaseConstant.getMetadataTable(entity.constructor.name)) as DataTableDecoratorParameter).name);
     this.entity = entity;
     this.entityParser = new SqliteDatabaseEntityParser(this.entity);
   }

@@ -19,12 +19,29 @@ export class SqliteDatabaseEntityParser {
     } else {
       this.entityList.push(entity);
     }
-    this.tableMetadata =  Reflect.get(this.entityList[0], SqliteDatabaseConstant.METADATA_TABLE) as DataTableDecoratorParameter;
-    this.fieldsMetadata = Reflect.get(this.entityList[0], SqliteDatabaseConstant.METADATA_FIELDS) as Object;
+    this.tableMetadata =  Reflect.get(this.entityList[0], SqliteDatabaseConstant.getMetadataTable(this.entityList[0].constructor.name)) as DataTableDecoratorParameter;
+    this.fieldsMetadata = this.mergerFieldsMetadata(this.entityList[0]);
     Object.keys(this.fieldsMetadata).forEach(key => {
       const fieldDecoratorParameter = Reflect.get(this.fieldsMetadata, key) as DataFieldDecoratorParameter;
       this.fieldMapping.set(key, fieldDecoratorParameter);
     })
+  }
+
+  private mergerFieldsMetadata(entity: Object): Object {
+    const proto = Reflect.get(entity, "__proto__") as Object;
+    if (proto.constructor.name === "Object") {
+     return new Object();
+    }
+
+    let currentObjectFields = Reflect.get(proto, SqliteDatabaseConstant.getMetadataFields(proto.constructor.name)) as Object;
+    if (!currentObjectFields) {
+      currentObjectFields = new Object();
+    }
+    const childObjectFields = this.mergerFieldsMetadata(proto);
+    for (const key of Object.keys(childObjectFields)) {
+      Reflect.set(currentObjectFields, key, Reflect.get(childObjectFields, key));
+    }
+    return currentObjectFields;
   }
 
   public getTableDecoratorParameter(): DataTableDecoratorParameter {

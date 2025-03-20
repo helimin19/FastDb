@@ -40,7 +40,7 @@ export interface DataTableDecoratorParameter {
  */
 export function DataTableDecorator(args: DataTableDecoratorParameter) {
   return <T extends Function>(constructor: T) => {
-    constructor.prototype[SqliteDatabaseConstant.METADATA_TABLE] = args;
+    constructor.prototype[SqliteDatabaseConstant.getMetadataTable(constructor.name)] = args;
   }
 }
 
@@ -59,10 +59,11 @@ export interface DataFieldDecoratorParameter {
 export function DataFieldDecorator(args: DataFieldDecoratorParameter) {
     return (target: Object, propertyName: string) => {
     let metadata = new Object();
-    if (Reflect.has(target.constructor.prototype, SqliteDatabaseConstant.METADATA_FIELDS)) {
-      metadata = Reflect.get(target.constructor.prototype, SqliteDatabaseConstant.METADATA_FIELDS);
+    const metadataFields = SqliteDatabaseConstant.getMetadataFields(target.constructor.name);
+    if (Reflect.has(target.constructor.prototype, metadataFields)) {
+      metadata = Reflect.get(target.constructor.prototype, metadataFields);
     }
     Reflect.set(metadata, propertyName, args);
-    Reflect.set(target.constructor.prototype, SqliteDatabaseConstant.METADATA_FIELDS, metadata);
+    Reflect.set(target.constructor.prototype, metadataFields, metadata);
   }
 }
