@@ -290,7 +290,7 @@ export class SqliteDatabase {
   public async selectAsync<T extends object>(where: QueryWhere, creator: () => T) : Promise<Array<T>> {
     const list = await this.selectRecordAsync(where);
     const items = this.dataTableRecordToEntityByEntity(list, creator);
-    return Promise.reject(items);
+    return Promise.resolve(items);
   }
 
   /**
